@@ -30,9 +30,6 @@ module spi_bridge (
             miso_r <= 0;
             sclk_d <= 0;
         end else begin
-            sclk_d <= sclk;    // salvam starea anterioara SCLK pentru detec?ia frontului
-            byte_sync_r <= 0;    // flag pentru dcd
-
             // activ doar cand CS este low
             if (!cs_n) begin   
                 shift_reg <= {shift_reg[6:0], mosi};  // shift propriu zis

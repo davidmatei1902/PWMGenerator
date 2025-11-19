@@ -30,6 +30,7 @@ module spi_bridge (
             miso_r <= 0;
             sclk_d <= 0;
         end else begin
+            byte_sync_r <= 0;
             // activ doar cand CS este low
             if (!cs_n) begin   
                 shift_reg <= {shift_reg[6:0], mosi};  // shift propriu zis

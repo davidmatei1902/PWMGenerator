@@ -1,9 +1,13 @@
 module instr_dcd (
+    // peripheral clock signals
     input clk,
     input rst_n,
+    // towards SPI slave interface signals
     input byte_sync,
     input [7:0] data_in,
     output [7:0] data_out,
+    
+    // register access signals
     output read,
     output write,
     output [5:0] addr,
@@ -15,6 +19,8 @@ module instr_dcd (
     reg rw_reg;
     reg hl_reg;
     reg [5:0] addr_reg;
+    
+    
     reg phase;
 
     reg read_r;

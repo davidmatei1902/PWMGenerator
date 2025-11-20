@@ -41,6 +41,9 @@ reg[7:0] functions_reg;
 // read mux
 reg[7:0] data_out_reg;
 
+// counter reset
+reg [1:0] count_reset_ctr;
+
 // output assignments
 assign period      = period_reg;
 assign en          = en_reg;
@@ -107,6 +110,14 @@ always @(posedge clk or negedge rst_n) begin
         functions_reg   <= 8'h00;
 
     end else begin
+        // pulse logic pentru COUNT_RESET
+        if (count_reset_ctr != 2'b00) begin
+            count_reset_reg <= 1'b1;
+            count_reset_ctr <= count_reset_ctr - 1;
+        end else begin
+            count_reset_reg <= 1'b0;
+        end
+        
         if (write) begin
             case (addr)
                 6'h00: period_reg[7:0]   <= data_write;
@@ -116,7 +127,7 @@ always @(posedge clk or negedge rst_n) begin
                 6'h04: compare1_reg[15:8]<= data_write;
                 6'h05: compare2_reg[7:0] <= data_write;
                 6'h06: compare2_reg[15:8]<= data_write;
-                6'h07: count_reset_reg   <= 1'b1; // pulse
+                6'h07: count_reset_ctr <= 2'b10; // 2 pulses of clock init
                 6'h0A: prescale_reg      <= data_write;
                 6'h0B: upnotdown_reg     <= data_write[0];
                 6'h0C: pwm_en_reg        <= data_write[0];

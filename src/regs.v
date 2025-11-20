@@ -32,7 +32,7 @@ reg[15:0] period_reg;
 reg en_reg;
 reg[15:0] compare1_reg;
 reg[15:0] compare2_reg;
-reg count_reset_reg;
+reg count_reset_reg;     // pulse-type
 reg upnotdown_reg;
 reg[7:0] prescale_reg;
 reg pwm_en_reg;
@@ -86,13 +86,14 @@ always @(*) begin
         // pwm en bit
         6'h0C: data_out_reg = {7'b0, pwm_en_reg};
         
-        // functions
+        // addr
         6'h0D: data_out_reg = functions_reg;
 
         default: data_out_reg = 8'h00;
     endcase
 end
 
+// write logic
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         period_reg      <= 16'h0000;
@@ -106,7 +107,22 @@ always @(posedge clk or negedge rst_n) begin
         functions_reg   <= 8'h00;
 
     end else begin
-        //TODO
+        if (write) begin
+            case (addr)
+                6'h00: period_reg[7:0]   <= data_write;
+                6'h01: period_reg[15:8]  <= data_write;
+                6'h02: en_reg            <= data_write[0];
+                6'h03: compare1_reg[7:0] <= data_write;
+                6'h04: compare1_reg[15:8]<= data_write;
+                6'h05: compare2_reg[7:0] <= data_write;
+                6'h06: compare2_reg[15:8]<= data_write;
+                6'h07: count_reset_reg   <= 1'b1; // pulse
+                6'h0A: prescale_reg      <= data_write;
+                6'h0B: upnotdown_reg     <= data_write[0];
+                6'h0C: pwm_en_reg        <= data_write[0];
+                6'h0D: functions_reg     <= data_write;
+            endcase
+        end
     end
 end
 

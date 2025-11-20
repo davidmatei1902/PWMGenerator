@@ -13,15 +13,15 @@ module spi_bridge (
     input[7:0] data_out
 );
     
-    reg [2:0] bit_cnt;    // counter pt biti
-    reg [7:0] shift_reg;  // registru de shift pentru MOSI
-    reg sclk_d;           // pentru detectarea fronturilor SCLK
+    reg [2:0] bit_cnt;    // bit counter
+    reg [7:0] shift_reg;  // shift register for MOSI
+    reg sclk_d;           // used for SCLK edge detection
     reg miso_r;
     reg byte_sync_r;
     reg [7:0] data_in_r;
 
     always @(posedge clk or negedge rst_n) begin
-        // blocul de reset
+        // reset block
         if (!rst_n) begin
             shift_reg <= 8'b0;
             bit_cnt <= 3'b0;
@@ -31,22 +31,22 @@ module spi_bridge (
             sclk_d <= 0;
         end else begin
             byte_sync_r <= 0;
-            // activ doar cand CS este low
+            // active only when CS is low
             if (!cs_n) begin   
-                shift_reg <= {shift_reg[6:0], mosi};  // shift propriu zis
+                shift_reg <= {shift_reg[6:0], mosi};  // actual shifting
                 bit_cnt <= bit_cnt + 1;
 
-                // trimitem bitul corespunz?tor din data_out pe MISO
+                // send the corresponding bit from data_out on MISO
                 miso_r <= data_out[7 - bit_cnt];
                 
-                // daca cumva am transmis tot
+                // if we have received the whole byte
                 if (bit_cnt == 3'd7) begin
-                    data_in_r <= {shift_reg[6:0], mosi}; // byte complet primit
-                    byte_sync_r <= 1;                    // semnalam cu flag ul sync
+                    data_in_r <= {shift_reg[6:0], mosi}; // complete received byte
+                    byte_sync_r <= 1;                    // signal with the sync flag
                     bit_cnt <= 0;
                 end
             end else begin
-                bit_cnt <= 0; // reset cand CS este HIGH
+                bit_cnt <= 0; // reset when CS is HIGH
             end
         end
     end

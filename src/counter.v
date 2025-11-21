@@ -39,4 +39,30 @@ module counter (
         end
     end
     
+    // internal block
+    always @(posedge clk or negedge rst_n) begin
+        // internal reset
+        if (!rst_n) begin
+            internal_count <= 16'b0;
+        end else if (count_reset) begin
+            internal_count <= 16'b0;
+        // update only if internal block is active and prescaler is en
+        end else if (en && tick_enable) begin
+            if (upnotdown) begin
+                // logic for upwards count
+                if (internal_count >= period) begin
+                    internal_count <= 16'b0;
+                end else begin
+                    internal_count <= internal_count + 1;
+                end
+            end else begin
+                // logic for downwards count
+                if (internal_count == 0) begin
+                    internal_count <= period;
+                end else begin
+                    internal_count <= internal_count - 1;
+                end
+            end
+        end
+    end
 endmodule

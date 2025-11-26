@@ -1,4 +1,4 @@
-# ⚙️ Programmable PWM Signal Generator
+# Programmable PWM Signal Generator
 
 ## Introduction
 

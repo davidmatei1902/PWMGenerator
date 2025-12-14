@@ -16,12 +16,14 @@ module pwm_gen (
     reg pwm_out_reg;
     
     always @(*) begin
+        // edge case: if compare values are equal, output 0 (0% duty)
+        if (compare1 == compare2) begin
+            pwm_logic_out = 1'b0;
         // check unaligned mode (window)
-        if (functions[1]) begin
+        end else if (functions[1]) begin
             // square window pwm logic - 001111100
-            if (compare1 >= compare2) begin
-                pwm_logic_out = 1'b0;  // edge case: invalid range
-            end else if (count_val >= compare1 && count_val < compare2) begin
+            // spec says this mode is designed for compare1 < compare2
+            if (count_val >= compare1 && count_val < compare2) begin
                 pwm_logic_out = 1'b1;
             end else begin
                 pwm_logic_out = 1'b0;

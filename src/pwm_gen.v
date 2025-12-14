@@ -19,7 +19,9 @@ module pwm_gen (
         // check unaligned mode (window)
         if (functions[1]) begin
             // square window pwm logic - 001111100
-            if (count_val >= compare1 && count_val < compare2) begin
+            if (compare1 >= compare2) begin
+                pwm_logic_out = 1'b0;  // edge case: invalid range
+            end else if (count_val >= compare1 && count_val < compare2) begin
                 pwm_logic_out = 1'b1;
             end else begin
                 pwm_logic_out = 1'b0;
@@ -28,7 +30,12 @@ module pwm_gen (
             // aligned mode
             if (functions[0] == 1'b0) begin
                 //  left alignment - 111110000
-                pwm_logic_out = (count_val < compare1) ? 1'b1 : 1'b0;
+                // compare1=0 means 0% duty cycle
+                if (compare1 == 16'b0) begin
+                    pwm_logic_out = 1'b0;
+                end else begin
+                    pwm_logic_out = (count_val <= compare1) ? 1'b1 : 1'b0;
+                end
             end else begin
                 // right alignment - 000001111
                 pwm_logic_out = (count_val < compare1) ? 1'b0 : 1'b1;
